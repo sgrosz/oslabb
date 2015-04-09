@@ -4,10 +4,12 @@
 #include <string.h>
 
 #define INPUT_LENGTH 80
+#define MAX_ARGS 4
 
 int main(int argc, char * argv[]){
 	char line[INPUT_LENGTH];
-	char *token;
+	char * args[MAX_ARGS];
+	char ** arg; 
 	
 	pid_t pid = fork();
 
@@ -17,11 +19,12 @@ int main(int argc, char * argv[]){
 			printf("$ ");
 			if(!fgets(line, INPUT_LENGTH, stdin)) break;
 			printf("%s", line);
-			token = strtok(line," ");
 
-	        printf ("%s\n",token);
-	        token = strtok(NULL, " ");
-	        printf ("%s\n",token);
+			arg = args;
+	        *arg++ = strtok(line," "); 
+	        while ((*arg++ = strtok(NULL, " ")));
+
+	        printf("%s\n", args[0]);
 		}
 		return 0;
 	}
