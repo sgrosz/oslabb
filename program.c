@@ -1,11 +1,13 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/types.h>
+#include <string.h>
 
 #define INPUT_LENGTH 80
 
 int main(int argc, char * argv[]){
 	char line[INPUT_LENGTH];
+	char *token;
 	
 	pid_t pid = fork();
 
@@ -15,6 +17,11 @@ int main(int argc, char * argv[]){
 			printf("$ ");
 			if(!fgets(line, INPUT_LENGTH, stdin)) break;
 			printf("%s", line);
+			token = strtok(line," ");
+
+	        printf ("%s\n",token);
+	        token = strtok(NULL, " ");
+	        printf ("%s\n",token);
 		}
 		return 0;
 	}
