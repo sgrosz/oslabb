@@ -2,8 +2,11 @@
 #include <string.h>
 #include <stdlib.h>
 #include "cd.h"
+#include "pipes.h"
 
 #define INPUT_LENGTH 80
+#define WRITE 1
+#define READ 0
 
 void handle_command(char * command);
 void func();
@@ -60,6 +63,8 @@ void handle_command(char * command){
     	}
     } else if(strcmp(cmd, "exit") == 0){
     	end = 1;
+    } else if(strcmp(cmd, "checkEnv") == 0){
+    	run_checkenv();
     }
 }
 

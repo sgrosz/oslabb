@@ -18,7 +18,6 @@ void print_current_directory(){
 	if(path_ptr == NULL){
         fprintf(stderr, "Error: %s\n", strerror(errno));
     }
-
     printf("%s", path_ptr);
 }
 
