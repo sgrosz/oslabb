@@ -6,12 +6,17 @@
 #define INPUT_LENGTH 80
 
 void handle_command(char * command);
+void func();
 
 char * home;
+int end;
 
 int main(){
 	char command[INPUT_LENGTH];
 	char * success;
+	end = 0;
+
+	atexit(func);
 
 	home = getenv("HOME");
 	change_dir(home);
@@ -29,7 +34,13 @@ int main(){
 		}
 
 		handle_command(command);
+
+		if(end){
+			break;
+		}
 	}
+
+	return 0;
 }
 
 /* Handles the command given in the prompt */
@@ -48,6 +59,11 @@ void handle_command(char * command){
     		change_dir(args);
     	}
     } else if(strcmp(cmd, "exit") == 0){
-    	printf("%s\n", cmd);
+    	end = 1;
     }
+}
+
+/* Handles termination of processes */
+void func(){
+	printf("Exiting\n");
 }
