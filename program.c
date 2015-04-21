@@ -4,7 +4,6 @@
 #include "cd.h"
 
 #define INPUT_LENGTH 80
-#define MAX_ARGS 4
 
 void handle_command(char * command);
 
@@ -41,6 +40,7 @@ void handle_command(char * command){
     cmd = strtok(command," "); 
 
     if(strcmp(cmd, "cd") == 0){
+    	printf("%s", cmd);
     	args = strtok(NULL, " ");
 
     	if(args == NULL){

@@ -1,6 +1,9 @@
 #include <stdio.h>
+#include <string.h>
 #include <unistd.h>
 #include <errno.h>
+
+#define INPUT_LENGTH 80
 
 void print_current_directory();
 void change_dir(char * path);
