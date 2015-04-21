@@ -40,8 +40,7 @@ void handle_command(char * command){
     cmd = strtok(command," "); 
 
     if(strcmp(cmd, "cd") == 0){
-    	printf("%s", cmd);
-    	args = strtok(NULL, " ");
+    	args = strtok(NULL, "\0");
 
     	if(args == NULL){
     		change_dir(home);
