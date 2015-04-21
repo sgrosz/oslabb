@@ -1,15 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
-#include <errno.h>
+#include "cd.h"
 
 #define INPUT_LENGTH 80
 #define MAX_ARGS 4
 
 void handle_command(char * command);
-void print_current_directory();
-void change_dir(char * path);
 
 char * home;
 
@@ -24,6 +21,8 @@ int main(){
 		print_current_directory();
 		printf("$ ");
 		success = fgets(command, INPUT_LENGTH, stdin);
+
+		/* A problem a first */
 		command[strlen(command) - 1] = '\0';
 
 		if(success == NULL){
@@ -49,29 +48,7 @@ void handle_command(char * command){
     	} else {
     		change_dir(args);
     	}
+    } else if(strcmp(cmd, "exit") == 0){
+    	printf("%s\n", cmd);
     }
-}
-
-/* Gets the current working directory and prints it */
-void print_current_directory(){
-	char * path_ptr;
-	char path[INPUT_LENGTH];
-
-	path_ptr = getcwd(path, INPUT_LENGTH);
-
-	if(path_ptr == NULL){
-        fprintf(stderr, "Error: %s\n", strerror(errno));
-    }
-
-    printf("%s", path_ptr);
-}
-
-/* Changes the current directory with the path param */
-void change_dir(char * path){
-	int ok;
-	ok = chdir(path);
-
-	if(ok != 0){
-		fprintf(stderr, "Error: %s\n", strerror(errno));
-	}
 }
