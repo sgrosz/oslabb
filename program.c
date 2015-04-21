@@ -1,9 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include "cd.h"
-
-#define INPUT_LENGTH 80
 
 void handle_command(char * command);
 
