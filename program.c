@@ -1,6 +1,9 @@
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 #include "cd.h"
+
+#define INPUT_LENGTH 80
 
 void handle_command(char * command);
 
@@ -15,7 +18,7 @@ int main(){
 	
 	while(1){
 		print_current_directory();
-		printf("$ ");
+		printf("> ");
 		success = fgets(command, INPUT_LENGTH, stdin);
 
 		/* A problem a first */
