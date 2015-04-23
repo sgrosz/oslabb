@@ -70,11 +70,7 @@ void handle_command(char * command){
     } else if(strcmp(cmd, "exit") == 0){
     	end = 1;
     } else if(strcmp(cmd, "checkEnv") == 0){
-    	t = fork();
-    	if(t == 0){
-    		run_checkenv();
-    	}
-    	/*wait(&status);*/
+		run_checkenv();
     }
 }
 

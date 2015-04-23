@@ -39,15 +39,17 @@ void run_checkenv(){
 		} else if(pager == 0){
 			close (p1[WRITE]);
 			dup2 (p1[READ], READ);
-		}
 
-		execlp("more", "more", 0);
+			/*This one ran outside the forloop -> in parent, not good*/
+			execlp("more", "more", 0);
+		}
 	}
 
 	/* This is the parent */
     close(p1[READ]);
     close(p1[WRITE]);
 
-    /*waitpid (pager, &status, 0);*/
-    printf("Done waiting for more.\n");
+    waitpid(printenv, &status, 0);
+    waitpid(pager, &status, 0);
+
 }
