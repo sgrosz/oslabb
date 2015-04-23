@@ -21,16 +21,17 @@ void run_checkenv(){
 
 	if(pipe(p1) == -1){
 		fprintf(stderr, "Error: %s\n", strerror(errno));
+		return;
 	}
 
 	printenv = fork();
 
 	if(printenv == -1){
 		fprintf(stderr, "Error: %s\n", strerror(errno));
+		return;
 	}else if(printenv == 0){
 		close(p1[READ]);
 		dup2(p1[WRITE], WRITE);
-		close(p1[WRITE]);
 
 		execvp("printenv", nargv);
 	} else {
@@ -41,7 +42,6 @@ void run_checkenv(){
 		} else if(pager == 0){
 			close (p1[WRITE]);
 			dup2 (p1[READ], READ);
-			close (p1[READ]);
 		}
 
 		execvp("more", margv);
@@ -51,6 +51,6 @@ void run_checkenv(){
     close(p1[READ]);
     close(p1[WRITE]);
 
-    waitpid (pager, &status, 0);
+    /*waitpid (pager, &status, 0);*/
     printf("Done waiting for more.\n");
 }

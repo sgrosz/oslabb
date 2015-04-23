@@ -1,6 +1,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <sys/wait.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <errno.h>
 #include "cd.h"
 #include "pipes.h"
 
@@ -13,6 +17,8 @@ void func();
 
 char * home;
 int end;
+int status;
+pid_t t;
 
 int main(){
 	char command[INPUT_LENGTH];
@@ -64,7 +70,11 @@ void handle_command(char * command){
     } else if(strcmp(cmd, "exit") == 0){
     	end = 1;
     } else if(strcmp(cmd, "checkEnv") == 0){
-    	run_checkenv();
+    	t = fork();
+    	if(t == 0){
+    		run_checkenv();
+    	}
+    	/*wait(&status);*/
     }
 }
 
