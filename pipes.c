@@ -10,9 +10,12 @@
 #define READ 0
 
 void run_checkenv();
+void run_pager();
+void run_printenv();
+void run_sort();
 
-int p1[2], p2[2];
-pid_t printenv, pager;
+int p1[2], p2[2], p3[2];
+pid_t printenv, pager, sort, grep;
 int status;
 
 void run_checkenv(){
@@ -21,6 +24,17 @@ void run_checkenv(){
 		return;
 	}
 
+	if(pipe(p2) == -1){
+		fprintf(stderr, "Error: %s\n", strerror(errno));
+		return;
+	}
+	
+	run_printenv();
+	run_sort();
+	run_pager();
+}
+
+void run_printenv(){
 	printenv = fork();
 
 	if(printenv == -1){
@@ -31,25 +45,48 @@ void run_checkenv(){
 		dup2(p1[WRITE], WRITE);
 
 		execlp("printenv", "printenv", 0);
-	} else {
-		pager = fork();
-
-		if(pager == -1){
-			fprintf(stderr, "Error: %s\n", strerror(errno));
-		} else if(pager == 0){
-			close (p1[WRITE]);
-			dup2 (p1[READ], READ);
-
-			/*This one ran outside the forloop -> in parent, not good*/
-			execlp("more", "more", 0);
-		}
 	}
 
-	/* This is the parent */
-    close(p1[READ]);
-    close(p1[WRITE]);
+	close(p1[WRITE]);
+	wait(&status);
+}
 
-    waitpid(printenv, &status, 0);
-    waitpid(pager, &status, 0);
+void run_sort(){
+	sort = fork();
 
+	if(sort == -1){
+		fprintf(stderr, "Error: %s\n", strerror(errno));
+		return;
+	}else if(sort == 0){
+
+		close(p1[WRITE]);
+		dup2(p1[READ], READ);
+
+		close(p2[READ]);
+		dup2(p2[WRITE], WRITE);
+
+		execlp("sort", "sort", 0);
+	}
+
+	close(p1[READ]);
+	close(p2[WRITE]);
+	wait(&status);
+}
+
+void run_pager(){
+	pager = fork();
+
+	if(pager == -1){
+		fprintf(stderr, "Error: %s\n", strerror(errno));
+	} else if(pager == 0){
+
+		close(p2[WRITE]);
+		dup2(p2[READ], READ);
+
+		/*This one ran outside the forloop -> in parent, not good*/
+		execlp("more", "more", 0);
+	}
+
+	close(p2[READ]);
+	wait(&status);
 }
