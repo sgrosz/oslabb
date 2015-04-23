@@ -16,9 +16,6 @@ pid_t printenv, pager;
 int status;
 
 void run_checkenv(){
-	char *nargv[5] = {"printenv", NULL};
-	char *margv[5] = {"more", NULL};
-
 	if(pipe(p1) == -1){
 		fprintf(stderr, "Error: %s\n", strerror(errno));
 		return;
@@ -33,7 +30,7 @@ void run_checkenv(){
 		close(p1[READ]);
 		dup2(p1[WRITE], WRITE);
 
-		execvp("printenv", nargv);
+		execlp("printenv", "printenv", 0);
 	} else {
 		pager = fork();
 
@@ -44,7 +41,7 @@ void run_checkenv(){
 			dup2 (p1[READ], READ);
 		}
 
-		execvp("more", margv);
+		execlp("more", "more", 0);
 	}
 
 	/* This is the parent */
