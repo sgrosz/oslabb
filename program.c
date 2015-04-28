@@ -58,10 +58,9 @@ void handle_command(char * command){
 	char * args;
 
     cmd = strtok(command," "); 
+    args = strtok(NULL, "\0");
 
     if(strcmp(cmd, "cd") == 0){
-    	args = strtok(NULL, "\0");
-
     	if(args == NULL){
     		change_dir(home);
     	} else {
@@ -70,7 +69,7 @@ void handle_command(char * command){
     } else if(strcmp(cmd, "exit") == 0){
     	end = 1;
     } else if(strcmp(cmd, "checkEnv") == 0){
-		run_checkenv();
+		run_checkenv(args);
     }
 }
 

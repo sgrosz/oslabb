@@ -9,17 +9,18 @@
 #define WRITE 1
 #define READ 0
 
-void run_checkenv();
+void run_checkenv(char * args);
 void run_pager();
 void run_printenv();
 void run_sort();
-void run_grep();
+void run_grep(char * args);
 
 int p1[2], p2[2], p3[2];
 pid_t printenv, pager, sort, grep;
 int status;
 
-void run_checkenv(){
+void run_checkenv(char * args){
+
 	if(pipe(p1) == -1){
 		fprintf(stderr, "Error: %s\n", strerror(errno));
 		return;
@@ -36,7 +37,7 @@ void run_checkenv(){
 	}
 
 	run_printenv();
-	run_grep();
+	run_grep(args);
 	run_sort();
 	run_pager();
 }
@@ -58,7 +59,7 @@ void run_printenv(){
 	wait(&status);
 }
 
-void run_grep(){
+void run_grep(char * args){
 	grep = fork();
 
 	if(grep == -1){
@@ -71,7 +72,11 @@ void run_grep(){
 		close(p2[READ]);
 		dup2(p2[WRITE], WRITE);
 
-		execlp("cat", "cat", 0);
+		if(args == NULL){
+			execlp("cat", "cat", 0);
+		} else{
+			execlp("grep", "grep", args, 0);
+		}
 	}
 	close(p1[READ]);
 	close(p2[WRITE]);
