@@ -47,7 +47,7 @@ int main(){
 		handle_command(command);
 
 		if(end){
-			exit(0);
+			exit(EXIT_SUCCESS);
 		}
 	}
 

@@ -49,7 +49,6 @@ void run_printenv(){
 		print_error();
 		return;
 	}else if(printenv == 0){
-
 		handle_error(close(p1[READ]));
 		handle_error(dup2(p1[WRITE], WRITE));
 
@@ -82,7 +81,6 @@ void run_grep(char * args){
 		print_error();
 		return;
 	}else if(grep == 0){
-		handle_error(close(p1[WRITE]));
 		handle_error(dup2(p1[READ], READ));
 
 		handle_error(close(p2[READ]));
@@ -108,8 +106,6 @@ void run_sort(){
 		print_error();
 		return;
 	}else if(sort == 0){
-
-		handle_error(close(p2[WRITE]));
 		handle_error(dup2(p2[READ], READ));
 
 		handle_error(close(p3[READ]));
@@ -136,7 +132,6 @@ void run_pager(){
 			pager_var = "less";
 		}
 
-		handle_error(close(p3[WRITE]));
 		handle_error(dup2(p3[READ], READ));
 
 		/*This one ran outside the forloop -> in parent, not good*/
