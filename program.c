@@ -7,6 +7,7 @@
 #include <errno.h>
 #include "cd.h"
 #include "pipes.h"
+#include "error.h"
 
 #define INPUT_LENGTH 80
 #define WRITE 1
@@ -38,14 +39,15 @@ int main(){
 		/* A problem a first */
 		command[strlen(command) - 1] = '\0';
 
-		if(success == NULL){
-			printf("The line was not scanned properly.\n");
+		if(strcmp(success,"") == 0 || success == NULL){
+			print_special_error("The line was not scanned properly");
+			continue;
 		}
 
 		handle_command(command);
 
 		if(end){
-			break;
+			exit(0);
 		}
 	}
 

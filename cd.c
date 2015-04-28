@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
-#include <errno.h>
+#include "error.h"
 
 #define INPUT_LENGTH 80
 
@@ -16,7 +16,7 @@ void print_current_directory(){
 	path_ptr = getcwd(path, INPUT_LENGTH);
 
 	if(path_ptr == NULL){
-        fprintf(stderr, "Error: %s\n", strerror(errno));
+        print_error();
     }
     printf("%s", path_ptr);
 }
@@ -27,6 +27,6 @@ void change_dir(char * path){
 	ok = chdir(path);
 
 	if(ok != 0){
-		fprintf(stderr, "Error: %s\n", strerror(errno));
+		print_error();
 	}
 }

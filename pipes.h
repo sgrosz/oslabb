@@ -1,5 +1,5 @@
 void run_checkenv(char * args);
-int run_pager();
-int run_printenv();
-int run_sort();
-int run_grep(char * args);
+void run_pager();
+void run_printenv();
+void run_sort();
+void run_grep(char * args);
