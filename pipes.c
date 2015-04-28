@@ -10,17 +10,17 @@
 #define READ 0
 
 void run_checkenv(char * args);
-void run_pager();
-void run_printenv();
-void run_sort();
-void run_grep(char * args);
+int run_pager();
+int run_printenv();
+int run_sort();
+int run_grep(char * args);
 
 int p1[2], p2[2], p3[2];
 pid_t printenv, pager, sort, grep;
 int status;
 
 void run_checkenv(char * args){
-
+	int err;
 	if(pipe(p1) == -1){
 		fprintf(stderr, "Error: %s\n", strerror(errno));
 		return;
@@ -36,35 +36,71 @@ void run_checkenv(char * args){
 		return;
 	}
 
-	run_printenv();
-	run_grep(args);
-	run_sort();
-	run_pager();
+	err = run_printenv();
+	if(err == -1){
+		return;
+	}
+	err = run_grep(args);
+	if(err == -1){
+		return;
+	}
+	err = run_sort();
+	if(err == -1){
+		return;
+	}
+	err = run_pager();
+	if(err == -1){
+		return;
+	}
 }
 
-void run_printenv(){
+int run_printenv(){
+	int err = 0;
 	printenv = fork();
 
 	if(printenv == -1){
 		fprintf(stderr, "Error: %s\n", strerror(errno));
-		return;
+		return -1;
 	}else if(printenv == 0){
 		close(p1[READ]);
 		dup2(p1[WRITE], WRITE);
 
-		execlp("printenv", "printenv", 0);
+		err = execlp("printenv", "printenv", 0);
+		fprintf(stderr, "%d\n", err);
+		fprintf(stderr, "Error: %s\n", strerror(errno));
 	}
 
 	close(p1[WRITE]);
 	wait(&status);
+	return err;
 }
 
-void run_grep(char * args){
+int run_grep(char * args){
+	int i;
+	char * arg;
+	char * arg_array[10];
+
+	int err = 0;
+	
+	/* Splits the arguments into an argument array*/
+	i = 1;
+	arg_array[0] = "grep";
+	arg = strtok(args ," "); 
+
+	while (arg != NULL){
+		arg_array[i++] = arg;
+		arg = strtok (NULL, " ");
+	}
+	arg_array[i++] = NULL;
+
+	for (i=0;i<3; ++i) 
+    	printf("%s\n", arg_array[i]);
+
 	grep = fork();
 
 	if(grep == -1){
 		fprintf(stderr, "Error: %s\n", strerror(errno));
-		return;
+		return -1;
 	}else if(grep == 0){
 		close(p1[WRITE]);
 		dup2(p1[READ], READ);
@@ -73,23 +109,27 @@ void run_grep(char * args){
 		dup2(p2[WRITE], WRITE);
 
 		if(args == NULL){
-			execlp("cat", "cat", 0);
+			err = execlp("cat", "cat", 0);
 		} else{
-			execlp("grep", "grep", args, 0);
+			err = execvp("grep", arg_array);
 		}
+		fprintf(stderr, "Error: %s\n", strerror(errno));
 	}
+
 	close(p1[READ]);
 	close(p2[WRITE]);
 	wait(&status);
+	return err;
 
 }
 
-void run_sort(){
+int run_sort(){
+	int err = 0;
 	sort = fork();
 
 	if(sort == -1){
 		fprintf(stderr, "Error: %s\n", strerror(errno));
-		return;
+		return -1;
 	}else if(sort == 0){
 
 		close(p2[WRITE]);
@@ -99,18 +139,22 @@ void run_sort(){
 		dup2(p3[WRITE], WRITE);
 
 		execlp("sort", "sort", 0);
+		fprintf(stderr, "Error: %s\n", strerror(errno));
 	}
 
 	close(p2[READ]);
 	close(p3[WRITE]);
 	wait(&status);
+	return err;
 }
 
-void run_pager(){
+int run_pager(){
+	int err = 0;
 	pager = fork();
 
 	if(pager == -1){
 		fprintf(stderr, "Error: %s\n", strerror(errno));
+		return -1;
 	} else if(pager == 0){
 		char * pager_var = getenv("PAGER");
 		if(pager_var == NULL){
@@ -124,9 +168,12 @@ void run_pager(){
 		execlp(pager_var, pager_var, 0);
 
 		/*If env-pager/less fails try more*/
-		execlp("more", "more", 0);
+		err = execlp("more", "more", 0);
+
+		fprintf(stderr, "Error: %s\n", strerror(errno));
 	}
 
 	close(p3[READ]);
 	wait(&status);
+	return err;
 }

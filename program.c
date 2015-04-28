@@ -58,7 +58,7 @@ void handle_command(char * command){
 	char * args;
 
     cmd = strtok(command," "); 
-    args = strtok(NULL, "\0");
+    args =  strtok(NULL, "\0");
 
     if(strcmp(cmd, "cd") == 0){
     	if(args == NULL){
