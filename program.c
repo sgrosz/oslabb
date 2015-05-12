@@ -5,16 +5,19 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <errno.h>
+#include <signal.h>
 #include "cd.h"
-#include "pipes.h"
+#include "checkenv.h"
 #include "error.h"
 
 #define INPUT_LENGTH 80
 #define WRITE 1
 #define READ 0
+#define SIGDET 1
 
 void handle_command(char * command);
 void func();
+void sig_handler(int signo);
 
 char * home;
 int end;

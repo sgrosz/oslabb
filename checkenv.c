@@ -16,8 +16,9 @@ void run_sort();
 void run_grep(char * args);
 
 int p1[2], p2[2], p3[2];
-pid_t printenv, pager, sort, grep;
+pid_t child;
 int status;
+
 
 void run_checkenv(char * args){
 	if(pipe(p1) == -1){
@@ -43,16 +44,16 @@ void run_checkenv(char * args){
 }
 
 void run_printenv(){
-	printenv = fork();
+	child = fork();
 
-	if(printenv == -1){
+	if(child == -1){
 		print_error();
 		return;
-	}else if(printenv == 0){
+	}else if(child == 0){
 		handle_error(close(p1[READ]));
 		handle_error(dup2(p1[WRITE], WRITE));
 
-		handle_error(execlp("printenv", "printenv", 0));
+		handle_error(execlp("printenv", "printenv", NULL));
 	}
 
 	handle_error(close(p1[WRITE]));
@@ -75,19 +76,19 @@ void run_grep(char * args){
 	}
 	arg_array[i++] = NULL;
 
-	grep = fork();
+	child = fork();
 
-	if(grep == -1){
+	if(child == -1){
 		print_error();
 		return;
-	}else if(grep == 0){
+	}else if(child == 0){
 		handle_error(dup2(p1[READ], READ));
 
 		handle_error(close(p2[READ]));
 		handle_error(dup2(p2[WRITE], WRITE));
 
 		if(args == NULL){
-			handle_error(execlp("cat", "cat", 0));
+			handle_error(execlp("cat", "cat", NULL));
 		} else{
 			handle_error(execvp("grep", arg_array));
 		}
@@ -100,18 +101,18 @@ void run_grep(char * args){
 }
 
 void run_sort(){
-	sort = fork();
+	child = fork();
 
-	if(sort == -1){
+	if(child == -1){
 		print_error();
 		return;
-	}else if(sort == 0){
+	}else if(child == 0){
 		handle_error(dup2(p2[READ], READ));
 
 		handle_error(close(p3[READ]));
 		handle_error(dup2(p3[WRITE], WRITE));
 
-		handle_error(execlp("sort", "sort", 0));
+		handle_error(execlp("sort", "sort", NULL));
 	}
 	
 	handle_error(close(p2[READ]));
@@ -121,12 +122,12 @@ void run_sort(){
 
 void run_pager(){
 	int err = 0;
-	pager = fork();
+	child = fork();
 
-	if(pager == -1){
+	if(child == -1){
 		print_error();
 		return;
-	} else if(pager == 0){
+	} else if(child == 0){
 		char * pager_var = getenv("PAGER");
 		if(pager_var == NULL){
 			pager_var = "less";
@@ -135,11 +136,11 @@ void run_pager(){
 		handle_error(dup2(p3[READ], READ));
 
 		/*This one ran outside the forloop -> in parent, not good*/
-		err = execlp(pager_var, pager_var, 0);
+		err = execlp(pager_var, pager_var, NULL);
 
 		/*If env-pager/less fails try more*/
 		if(err == -1)
-			handle_error(execlp("more", "more", 0));
+			handle_error(execlp("more", "more", NULL));
 	}
 
 	handle_error(close(p3[READ]));
