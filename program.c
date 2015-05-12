@@ -11,6 +11,14 @@
 #include "checkenv.h"
 #include "helper.h"
 
+#ifdef SIGDET
+#define SIGHANDLER SIGDET
+#endif
+
+#ifndef SIGDET
+#define SIGHANDLER 0
+#endif
+
 #define INPUT_LENGTH 80
 #define WRITE 1
 #define READ 0
@@ -30,13 +38,14 @@ int main(){
 	char command[INPUT_LENGTH];
 	char * success;
 
-	atexit(func);
-
 	home = getenv("HOME");
 	change_dir(home);
 	
 	while(1){
-		terminated_polling();
+
+		if(SIGHANDLER == 0){
+			terminated_polling();
+		}
 
 		print_current_directory();
 		printf("> ");
@@ -110,7 +119,7 @@ void exec_foreground(char * cmd, char ** arguments){
 		handle_error(execvp(cmd, arguments));
 	}
 
-	printf("%d: Foreground process were started.\n", p);
+	printf("Foreground process %d were started.\n", p);
 	
 	handle_error(waitpid(p, &status, 0));
 	handle_error(gettimeofday(&end, NULL));
@@ -127,7 +136,7 @@ void exec_background(char * cmd, char ** arguments){
 		handle_error(execvp(cmd, arguments));
 	}
 
-	printf("%d: Background process were started.\n", p);
+	printf("Background process %d were started.\n", p);
 }
 
 void terminated_polling(){
