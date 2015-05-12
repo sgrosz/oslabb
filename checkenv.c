@@ -3,15 +3,10 @@
 #include <unistd.h>
 
 #include "helper.h"
+#include "checkenv.h"
 
 #define WRITE 1
 #define READ 0
-
-void run_checkenv(char * args);
-void run_pager();
-void run_printenv();
-void run_sort();
-void run_grep(char * args);
 
 int p1[2], p2[2], p3[2];
 pid_t child;

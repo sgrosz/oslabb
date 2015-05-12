@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <unistd.h>
+
 #include "helper.h"
+#include "cd.h"
 
 #define INPUT_LENGTH 80
 

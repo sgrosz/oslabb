@@ -3,11 +3,7 @@
 #include <signal.h>
 
 #include "cd.h"
-
-void background_terminated();
-void setup_child_handler();
-void setup_interrupt_handler();
-void interrupt_handler(int signum);
+#include "signal-handler.h"
 
 void background_terminated(){
 	pid_t p;

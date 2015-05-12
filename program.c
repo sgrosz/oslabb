@@ -9,6 +9,7 @@
 #include "checkenv.h"
 #include "helper.h"
 #include "signal-handler.h"
+#include "program.h"
 
 #ifdef SIGDET
 #define SIGHANDLER SIGDET
@@ -21,13 +22,6 @@
 #define INPUT_LENGTH 80
 #define WRITE 1
 #define READ 0
-
-void handle_command(char * command);
-void func();
-void sig_handler(int signo);
-void exec_foreground(char * cmd, char ** arguments);
-void exec_background(char * cmd, char ** arguments);
-void exec(char * cmd, char * args);
 
 char * home;
 int status;
