@@ -21,6 +21,7 @@ void sig_handler(int signo);
 void exec_foreground(char * cmd, char ** arguments);
 void exec_background(char * cmd, char ** arguments);
 void exec(char * cmd, char * args);
+void terminated_polling();
 
 char * home;
 int status;
@@ -35,6 +36,8 @@ int main(){
 	change_dir(home);
 	
 	while(1){
+		terminated_polling();
+
 		print_current_directory();
 		printf("> ");
 		success = fgets(command, INPUT_LENGTH, stdin);
@@ -107,11 +110,11 @@ void exec_foreground(char * cmd, char ** arguments){
 		handle_error(execvp(cmd, arguments));
 	}
 
-	fprintf(stderr, "%d: Foreground process were started.\n", p);
+	printf("%d: Foreground process were started.\n", p);
 	
-	handle_error(wait(&status));
+	handle_error(waitpid(p, &status, 0));
 	handle_error(gettimeofday(&end, NULL));
-	fprintf(stderr, "Foreground process ended. Time elapsed: %ld μs\n", timevaldiff(&start, &end));
+	printf("Foreground process ended. Time elapsed: %ld μs\n", timevaldiff(&start, &end));
 }
 
 void exec_background(char * cmd, char ** arguments){
@@ -124,7 +127,15 @@ void exec_background(char * cmd, char ** arguments){
 		handle_error(execvp(cmd, arguments));
 	}
 
-	fprintf(stderr, "%d: Background process were started.\n", p);
+	printf("%d: Background process were started.\n", p);
+}
+
+void terminated_polling(){
+	int status;
+
+	if(waitpid(-1, &status, WNOHANG) != 0 && waitpid(-1, &status, WNOHANG) != -1){
+		printf("Background process terminated\n");
+	}
 }
 
 /* Handles termination of processes */
