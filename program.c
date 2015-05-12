@@ -114,7 +114,7 @@ void exec_foreground(char * cmd, char ** arguments){
 	
 	handle_error(waitpid(p, &status, 0));
 	handle_error(gettimeofday(&end, NULL));
-	printf("Foreground process ended. Time elapsed: %ld μs\n", timevaldiff(&start, &end));
+	printf("Foreground process %d terminated. Time elapsed: %ld μs\n", p, timevaldiff(&start, &end));
 }
 
 void exec_background(char * cmd, char ** arguments){
@@ -131,10 +131,11 @@ void exec_background(char * cmd, char ** arguments){
 }
 
 void terminated_polling(){
+	pid_t p;
 	int status;
 
-	if(waitpid(-1, &status, WNOHANG) != 0 && waitpid(-1, &status, WNOHANG) != -1){
-		printf("Background process terminated\n");
+	if((p = waitpid(-1, &status, WNOHANG)) > 0){
+		printf("Background process %d terminated\n", p);
 	}
 }
 
