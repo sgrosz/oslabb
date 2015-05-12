@@ -7,6 +7,7 @@
 #include <errno.h>
 #include <signal.h>
 #include <sys/time.h>
+#include <signal.h>
 #include "cd.h"
 #include "checkenv.h"
 #include "helper.h"
@@ -30,7 +31,9 @@ void exec_foreground(char * cmd, char ** arguments);
 void exec_background(char * cmd, char ** arguments);
 void exec(char * cmd, char * args);
 void background_terminated();
-void setup_detection();
+void setup_child_handler();
+void setup_interrupt_handler();
+void interrupt_handler(int signum);
 
 char * home;
 int status;
@@ -42,11 +45,15 @@ int main(){
 	home = getenv("HOME");
 	change_dir(home);
 
-	setup_detection();
+	setup_interrupt_handler();
+
+	if(SIGHANDLER){
+		setup_child_handler();
+	}
 	
 	while(1){
 
-		if(SIGHANDLER == 0){
+		if(!SIGHANDLER){
 			background_terminated();
 		}
 
@@ -110,10 +117,14 @@ void exec(char * cmd, char * args){
 }
 
 void exec_foreground(char * cmd, char ** arguments){
+	/*sigset_t block, empty;*/
 	struct timeval start, end;
 	pid_t p;
 
 	gettimeofday(&start, NULL);
+
+	sighold(SIGCHLD);
+
 	p = fork();
 
 	if(p == -1){
@@ -127,6 +138,8 @@ void exec_foreground(char * cmd, char ** arguments){
 	handle_error(waitpid(p, &status, 0));
 	handle_error(gettimeofday(&end, NULL));
 	printf("Foreground process %d terminated. Time elapsed: %ld μs\n", p, timevaldiff(&start, &end));
+
+	sigrelse(SIGCHLD);
 }
 
 void exec_background(char * cmd, char ** arguments){
@@ -151,18 +164,36 @@ void background_terminated(){
 	}
 }
 
-void child(int signum){
-	printf("%d\n", signum);
+void setup_child_handler(){
+	/* Establish handler. */
+	struct sigaction child;
+	child.sa_handler = &background_terminated;
+	child.sa_flags = SA_RESTART;
+	sigemptyset(&child.sa_mask);
+
+	sigaction(SIGCHLD, &child, 0);
 }
 
-void setup_detection(){
+void setup_interrupt_handler(){
 	/* Establish handler. */
-	struct sigaction sa;
-	sa.sa_handler = &background_terminated;
-	sa.sa_flags = SA_RESTART;
-	sigemptyset(&sa.sa_mask);
+	struct sigaction interrupt;
+	interrupt.sa_handler = &interrupt_handler;
+	interrupt.sa_flags = SA_RESTART;
+	sigemptyset(&interrupt.sa_mask);
 
-	sigaction(SIGCHLD, &sa, 0);
+	sigaction(SIGINT, &interrupt, 0);
+}
+
+void interrupt_handler(int signum){
+	/*DO NOTHING*/
+
+	fflush(stdin);
+
+	printf("\n");
+	print_current_directory();
+	printf("> ");
+
+	fflush(stdout);
 }
 
 /* Handles termination of processes */
