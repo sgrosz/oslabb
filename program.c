@@ -8,26 +8,24 @@
 #include <signal.h>
 #include "cd.h"
 #include "checkenv.h"
-#include "error.h"
+#include "helper.h"
 
 #define INPUT_LENGTH 80
 #define WRITE 1
 #define READ 0
-#define SIGDET 1
 
 void handle_command(char * command);
 void func();
 void sig_handler(int signo);
+void exec_foreground(char * cmd, char * args);
 
 char * home;
-int end;
 int status;
-pid_t t;
+pid_t child;
 
 int main(){
 	char command[INPUT_LENGTH];
 	char * success;
-	end = 0;
 
 	atexit(func);
 
@@ -42,16 +40,12 @@ int main(){
 		/* A problem a first */
 		command[strlen(command) - 1] = '\0';
 
-		if(strcmp(success,"") == 0 || success == NULL){
-			print_special_error("The line was not scanned properly");
+		if(success == NULL){
+			print_error("The line was not scanned properly");
 			continue;
 		}
 
 		handle_command(command);
-
-		if(end){
-			exit(EXIT_SUCCESS);
-		}
 	}
 
 	return 0;
@@ -72,10 +66,24 @@ void handle_command(char * command){
     		change_dir(args);
     	}
     } else if(strcmp(cmd, "exit") == 0){
-    	end = 1;
+    	exit(EXIT_SUCCESS);
     } else if(strcmp(cmd, "checkEnv") == 0){
 		run_checkenv(args);
+    } else{
+    	exec_foreground(cmd, args);
     }
+}
+
+void exec_foreground(char * cmd, char * args){
+	child = fork();
+	if(child == -1){
+		print_error();
+	} else if(child == 0){
+		handle_error(execvp(cmd, handle_args(cmd, args)));
+	}
+
+	wait(&status);
+
 }
 
 /* Handles termination of processes */

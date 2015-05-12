@@ -4,7 +4,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include <sys/types.h>
-#include "error.h"
+#include "helper.h"
 
 #define WRITE 1
 #define READ 0
@@ -61,12 +61,12 @@ void run_printenv(){
 }
 
 void run_grep(char * args){
-	int i;
+	/*int i;
 	char * arg;
-	char * arg_array[10];
+	char * arg_array[10];*/
 	
 	/* Splits the arguments into an argument array*/
-	i = 1;
+	/*i = 1;
 	arg_array[0] = "grep";
 	arg = strtok(args ," "); 
 
@@ -74,7 +74,7 @@ void run_grep(char * args){
 		arg_array[i++] = arg;
 		arg = strtok (NULL, " ");
 	}
-	arg_array[i++] = NULL;
+	arg_array[i++] = NULL;*/
 
 	child = fork();
 
@@ -90,7 +90,7 @@ void run_grep(char * args){
 		if(args == NULL){
 			handle_error(execlp("cat", "cat", NULL));
 		} else{
-			handle_error(execvp("grep", arg_array));
+			handle_error(execvp("grep", handle_args("grep", args)));
 		}
 	}
 

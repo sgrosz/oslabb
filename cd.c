@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
-#include "error.h"
+#include "helper.h"
 
 #define INPUT_LENGTH 80
 
