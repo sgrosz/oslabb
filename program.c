@@ -6,6 +6,7 @@
 #include <sys/types.h>
 #include <errno.h>
 #include <signal.h>
+#include <sys/time.h>
 #include "cd.h"
 #include "checkenv.h"
 #include "helper.h"
@@ -17,11 +18,12 @@
 void handle_command(char * command);
 void func();
 void sig_handler(int signo);
-void exec_foreground(char * cmd, char * args);
+void exec_foreground(char * cmd, char ** arguments);
+void exec_background(char * cmd, char ** arguments);
+void exec(char * cmd, char * args);
 
 char * home;
 int status;
-pid_t child;
 
 int main(){
 	char command[INPUT_LENGTH];
@@ -70,20 +72,59 @@ void handle_command(char * command){
     } else if(strcmp(cmd, "checkEnv") == 0){
 		run_checkenv(args);
     } else{
-    	exec_foreground(cmd, args);
+    	exec(cmd, args);
     }
 }
 
-void exec_foreground(char * cmd, char * args){
-	child = fork();
-	if(child == -1){
-		print_error();
-	} else if(child == 0){
-		handle_error(execvp(cmd, handle_args(cmd, args)));
+void exec(char * cmd, char * args){
+	char ** arguments;
+	int arg_number = 0;
+
+	arguments = handle_args(cmd, args);
+
+	while(arguments[arg_number] != NULL){
+		arg_number++;
 	}
 
-	wait(&status);
+	if(strcmp("&", arguments[arg_number - 1]) == 0){
+		arguments[arg_number - 1] = NULL;
+		exec_background(cmd, arguments);
+	}else{
+		exec_foreground(cmd, arguments);
+	}
+}
 
+void exec_foreground(char * cmd, char ** arguments){
+	struct timeval start, end;
+	pid_t p;
+
+	gettimeofday(&start, NULL);
+	p = fork();
+
+	if(p == -1){
+		print_error();
+	} else if(p == 0){
+		handle_error(execvp(cmd, arguments));
+	}
+
+	fprintf(stderr, "%d: Foreground process were started.\n", p);
+	
+	handle_error(wait(&status));
+	handle_error(gettimeofday(&end, NULL));
+	fprintf(stderr, "Foreground process ended. Time elapsed: %ld μs\n", timevaldiff(&start, &end));
+}
+
+void exec_background(char * cmd, char ** arguments){
+	pid_t p;
+	p = fork();
+	
+	if(p == -1){
+		print_error();
+	} else if(p == 0){
+		handle_error(execvp(cmd, arguments));
+	}
+
+	fprintf(stderr, "%d: Background process were started.\n", p);
 }
 
 /* Handles termination of processes */

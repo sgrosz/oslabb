@@ -6,7 +6,8 @@
 void print_error();
 void print_special_error(char * arg);
 void handle_error();
-char * const * handle_args(char * cmd, char * args);
+char ** handle_args(char * cmd, char * args);
+long timevaldiff(struct timeval * start, struct timeval * end);
 
 char * arg_array[10];
 
@@ -25,7 +26,7 @@ void handle_error(int err){
 	}
 }
 
-char * const * handle_args(char * cmd, char * args){
+char ** handle_args(char * cmd, char * args){
 	int i;
 	char * arg;
 	
@@ -41,4 +42,13 @@ char * const * handle_args(char * cmd, char * args){
 	arg_array[i++] = NULL;
 
 	return arg_array;
+}
+
+long timevaldiff(struct timeval * start, struct timeval * end){
+  long usec;
+
+  usec=(end->tv_sec - start->tv_sec) * 1000000;
+  usec+=(end->tv_usec - start->tv_usec);
+
+  return usec;
 }
