@@ -49,8 +49,6 @@ void setup_termination_handler(){
 
 void interrupt_handler(int signum){
 	/*DO NOTHING*/
-	fflush(stdin);
-
 	printf("\n");
 	print_current_directory();
 	printf("> ");

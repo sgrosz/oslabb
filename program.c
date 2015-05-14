@@ -50,17 +50,14 @@ int main(){
 		printf("> ");
 		success = fgets(command, INPUT_LENGTH, stdin);
 
-		if(strcmp(command, "\04")){
-			exit(1);
+		if(success == NULL){
+			print_special_error("The line was not scanned properly");
+			perror("FGETS");
+			continue;
 		}
 
 		/* A problem a first */
 		command[strlen(command) - 1] = '\0';
-
-		if(success == NULL){
-			print_error("The line was not scanned properly");
-			continue;
-		}
 
 		handle_command(command);
 	}
@@ -76,8 +73,6 @@ void handle_command(char * command){
     cmd = strtok(command," "); 
     args =  strtok(NULL, "\0");
 
-    printf("%s\n", cmd);
-
     if(cmd == NULL){
     	return;
     }
@@ -89,7 +84,7 @@ void handle_command(char * command){
     		change_dir(args);
     	}
     } else if(strcmp(cmd, "exit") == 0){
-    	exit(EXIT_SUCCESS);
+    	exit_shell();
     } else if(strcmp(cmd, "checkEnv") == 0){
 		run_checkenv(args);
     } else{
@@ -153,4 +148,11 @@ void exec_background(char * cmd, char ** arguments){
 	}
 
 	printf("Background process %d were started.\n", p);
+}
+
+void exit_shell(){
+	pid_t parent;
+	parent = getpid();
+
+	kill(-parent, SIGTERM);
 }
