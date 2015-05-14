@@ -1,4 +1,4 @@
-#define _XOPEN_SOURCE 500
+/*#define _XOPEN_SOURCE 500*/
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -6,6 +6,7 @@
 #include <sys/time.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <signal.h>
 
 #include "cd.h"
 #include "checkenv.h"

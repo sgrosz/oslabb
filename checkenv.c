@@ -56,21 +56,6 @@ void run_printenv(){
 }
 
 void run_grep(char * args){
-	/*int i;
-	char * arg;
-	char * arg_array[10];*/
-	
-	/* Splits the arguments into an argument array*/
-	/*i = 1;
-	arg_array[0] = "grep";
-	arg = strtok(args ," "); 
-
-	while (arg != NULL){
-		arg_array[i++] = arg;
-		arg = strtok (NULL, " ");
-	}
-	arg_array[i++] = NULL;*/
-
 	child = fork();
 
 	if(child == -1){
