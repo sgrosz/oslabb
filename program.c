@@ -27,6 +27,11 @@
 char * home;
 int status;
 
+/*	Runs the shell. First it setups the current directory to the HOME directory.
+	Then it setup the interrupt handler for Ctrl-C and for children processes (
+	only if SIGDET is set to 1 during compilation. The shell is then setup to
+	get input from the user and makes sure the input is handled before prompting
+	the user again for intput. */
 int main(){
 	char command[INPUT_LENGTH];
 	char * success;
@@ -55,16 +60,15 @@ int main(){
 			continue;
 		}
 
-		/* A problem a first */
 		command[strlen(command) - 1] = '\0';
-
 		handle_command(command);
 	}
 
 	return 0;
 }
 
-/* Handles the command given in the prompt */
+/*	Parses the command and makes sure the correct function handles
+	the given command. */
 void handle_command(char * command){
 	char * cmd;
 	char * args;
@@ -91,6 +95,9 @@ void handle_command(char * command){
     }
 }
 
+/*	Parses the commands arguments and then makes sure that the commands
+	that are not cd, exit or checkEnv are executed either as a foreground
+	process or background process. */
 void exec(char * cmd, char * args){
 	char ** arguments;
 	int arg_number = 0;
@@ -109,14 +116,19 @@ void exec(char * cmd, char * args){
 	}
 }
 
+/*	Executes the command in a new process that will execute in the foreground.
+	The main process, the shell, will get the current time, output that a
+	foreground process has started and then wait until it finished. Then it will
+	get the time of termination of the foreground process and then calculate the
+	time elapsed. The shell then outputs that a foreground process has terminated
+	and the time it took to execute. */
 void exec_foreground(char * cmd, char ** arguments){
-	/*sigset_t block, empty;*/
 	struct timeval start, end;
 	pid_t p;
 
 	handle_error(gettimeofday(&start, NULL), "program.c:117");
 
-	/* Defers the signals from children processes until sigrelse */
+	/* Postpones the signals from children processes until sigrelse */
 	handle_error(sighold(SIGCHLD), "program.c:120");
 
 	p = fork();
@@ -137,6 +149,9 @@ void exec_foreground(char * cmd, char ** arguments){
 	handle_error(sigrelse(SIGCHLD), "program.c:136");
 }
 
+/*	Executes the command in a new process that will execute in the background.
+	The main process, the shell, will output that a background process have been
+	started and which PID the process has. */
 void exec_background(char * cmd, char ** arguments){
 	pid_t p;
 	p = fork();
@@ -151,6 +166,9 @@ void exec_background(char * cmd, char ** arguments){
 	fprintf(stderr, "Background process %d were started.\n", p);
 }
 
+/*	Exits the shell by using the command kill. This way all process that share the
+	same group PID as the current process will be signaled to terminated with the
+	signal SIGTERM. */
 void exit_shell(){
 	pid_t parent;
 	parent = getpid();
