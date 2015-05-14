@@ -8,18 +8,13 @@
 
 char * arg_array[10];
 
-void print_error(){
-	fprintf(stderr, "Error: %s\n", strerror(errno));
+void print_error(char * message){
+	perror(message);
 }
 
-void print_special_error(char * arg){
-	fprintf(stderr, "Error: %s\n", arg);
-}
-
-void handle_error(int err){
+void handle_error(int err, char * message){
 	if(err == -1){
-		print_error();
-		/*exit(EXIT_FAILURE);*/
+		print_error(message);
 	}
 }
 
@@ -34,7 +29,7 @@ char ** handle_args(char * cmd, char * args){
 
 	while (arg != NULL){
 		arg_array[i++] = arg;
-		arg = strtok (NULL, " ");
+		arg = strtok(NULL, " ");
 	}
 	arg_array[i++] = NULL;
 

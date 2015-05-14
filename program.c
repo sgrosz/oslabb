@@ -47,12 +47,11 @@ int main(){
 		}
 
 		print_current_directory();
-		printf("> ");
+		printf("$ ");
 		success = fgets(command, INPUT_LENGTH, stdin);
 
 		if(success == NULL){
-			print_special_error("The line was not scanned properly");
-			perror("FGETS");
+			print_error("program.c:51");
 			continue;
 		}
 
@@ -115,26 +114,27 @@ void exec_foreground(char * cmd, char ** arguments){
 	struct timeval start, end;
 	pid_t p;
 
-	gettimeofday(&start, NULL);
+	handle_error(gettimeofday(&start, NULL), "program.c:117");
 
 	/* Defers the signals from children processes until sigrelse */
-	sighold(SIGCHLD);
+	handle_error(sighold(SIGCHLD), "program.c:120");
 
 	p = fork();
 
 	if(p == -1){
-		print_error();
+		print_error("program.c:122");
+		return;
 	} else if(p == 0){
-		handle_error(execvp(cmd, arguments));
+		handle_error(execvp(cmd, arguments), "program.c:127");
 	}
 
-	printf("Foreground process %d were started.\n", p);
+	fprintf(stderr, "Foreground process %d were started.\n", p);
 	
-	handle_error(waitpid(p, &status, 0));
-	handle_error(gettimeofday(&end, NULL));
-	printf("Foreground process %d terminated. Time elapsed: %ld μs\n", p, timevaldiff(&start, &end));
+	handle_error(waitpid(p, &status, 0), "program.c:132");
+	handle_error(gettimeofday(&end, NULL), "program.c:133");
+	fprintf(stderr, "Foreground process %d terminated. Time elapsed: %ld μs\n", p, timevaldiff(&start, &end));
 
-	sigrelse(SIGCHLD);
+	handle_error(sigrelse(SIGCHLD), "program.c:136");
 }
 
 void exec_background(char * cmd, char ** arguments){
@@ -142,17 +142,18 @@ void exec_background(char * cmd, char ** arguments){
 	p = fork();
 	
 	if(p == -1){
-		print_error();
+		print_error("program.c:141");
+		return;
 	} else if(p == 0){
-		handle_error(execvp(cmd, arguments));
+		handle_error(execvp(cmd, arguments), "program.c:146");
 	}
 
-	printf("Background process %d were started.\n", p);
+	fprintf(stderr, "Background process %d were started.\n", p);
 }
 
 void exit_shell(){
 	pid_t parent;
 	parent = getpid();
 
-	kill(-parent, SIGTERM);
+	handle_error(kill(-parent, SIGTERM), "program.c:156");
 }

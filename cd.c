@@ -17,17 +17,12 @@ void print_current_directory(){
 	path_ptr = getcwd(path, INPUT_LENGTH);
 
 	if(path_ptr == NULL){
-        print_error();
+        print_error("cd.c:17");
     }
     printf("%s", path_ptr);
 }
 
 /* Changes the current directory with the path param */
 void change_dir(char * path){
-	int ok;
-	ok = chdir(path);
-
-	if(ok != 0){
-		print_error();
-	}
+	handle_error(chdir(path), "cd.c:28");
 }
