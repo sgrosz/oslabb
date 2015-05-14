@@ -1,4 +1,4 @@
-/*#define _XOPEN_SOURCE 500*/
+#define _XOPEN_SOURCE 500
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -50,6 +50,10 @@ int main(){
 		printf("> ");
 		success = fgets(command, INPUT_LENGTH, stdin);
 
+		if(strcmp(command, "\04")){
+			exit(1);
+		}
+
 		/* A problem a first */
 		command[strlen(command) - 1] = '\0';
 
@@ -71,6 +75,12 @@ void handle_command(char * command){
 
     cmd = strtok(command," "); 
     args =  strtok(NULL, "\0");
+
+    printf("%s\n", cmd);
+
+    if(cmd == NULL){
+    	return;
+    }
 
     if(strcmp(cmd, "cd") == 0){
     	if(args == NULL){

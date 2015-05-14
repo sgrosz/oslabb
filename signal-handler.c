@@ -37,9 +37,18 @@ void setup_interrupt_handler(){
 	sigaction(SIGINT, &interrupt, 0);
 }
 
+void setup_termination_handler(){
+	/* Establish handler. */
+	struct sigaction termination;
+	termination.sa_handler = &interrupt_handler;
+	termination.sa_flags = SA_RESTART;
+	sigemptyset(&termination.sa_mask);
+
+	sigaction(SIGQUIT, &termination, 0);
+}
+
 void interrupt_handler(int signum){
 	/*DO NOTHING*/
-
 	fflush(stdin);
 
 	printf("\n");
@@ -47,4 +56,8 @@ void interrupt_handler(int signum){
 	printf("> ");
 
 	fflush(stdout);
+}
+
+void termination_handler(int signum){
+	printf("QUIT");
 }
