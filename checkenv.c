@@ -7,6 +7,7 @@
 #include "helper.h"
 #include "checkenv.h"
 
+/*Define WRITE and READ for more readable code*/
 #define WRITE 1
 #define READ 0
 
@@ -14,7 +15,8 @@ int p1[2], p2[2], p3[2];
 pid_t child;
 int status;
 
-
+/*First creates pipes and checks them for errors.
+Then systematically execute printenv, grep, sort and pager.*/
 void run_checkenv(char * args){
 	if(pipe(p1) == -1){
 		print_error("checkenv.c:19");
@@ -37,7 +39,10 @@ void run_checkenv(char * args){
 	run_pager();
 
 }
-
+/*Turns child into a forked process and checks if successful. 
+Closes the READ end of pipe 1  and redirects WRITE of child to pipe 1 before executing
+printenv. If fork is succesful, function always ends with closing WRITE of pipe 1 and
+waiting for child.*/
 void run_printenv(){
 	child = fork();
 
@@ -54,7 +59,11 @@ void run_printenv(){
 	handle_error(close(p1[WRITE]), "checkenv.c:54");
 	handle_error(wait(&status), "checkenv.c:55");
 }
-
+/*Turns the child into a forked process and checks if successful. If successful it
+redirects READ of child to pipe 1, closes READ of pipe 2 and redirects WRITE of child to 
+WRITE of pipe 2. If there are no arguments for grep, concatenate. If there are, 
+execute grep. If fork is succesful, function always ends with closing READ of pipe 1, 
+WRITE of pipe 2 and waiting for child.*/
 void run_grep(char * args){
 	child = fork();
 
@@ -80,6 +89,10 @@ void run_grep(char * args){
 
 }
 
+/*Turns the child into a forked process and checks if successful. If successful, it
+redirects READ of child to READ of pipe 2, closes the READ of pipe 3, redirects
+WRITE of child to WRITE of pipe 3 and executes sort. If fork is successful, it
+ends with closing READ of pipe 2, WRITE of pipe 3 and waiting for child.*/
 void run_sort(){
 	child = fork();
 
@@ -100,6 +113,10 @@ void run_sort(){
 	handle_error(wait(&status), "checkenv.c:100");
 }
 
+/*Turns the child into a forked process and checks if successful. If successful we fetch
+the PAGER environment. If no PAGER variable is set, use "less". Redirect READ of child
+to READ of pipe 3. Try executing pager using pager_var, if unsuccessful, execute pager
+using "more". If fork was succesful, end by closing READ of pipe 3 and waiting for child.*/
 void run_pager(){
 	int err = 0;
 	child = fork();
