@@ -1,9 +1,11 @@
+#define _XOPEN_SOURCE 500
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <signal.h>
 #include <sys/time.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 #include "cd.h"
 #include "checkenv.h"
@@ -20,8 +22,6 @@
 #endif
 
 #define INPUT_LENGTH 80
-#define WRITE 1
-#define READ 0
 
 char * home;
 int status;
@@ -111,6 +111,7 @@ void exec_foreground(char * cmd, char ** arguments){
 
 	gettimeofday(&start, NULL);
 
+	/* Defers the signals from children processes until sigrelse */
 	sighold(SIGCHLD);
 
 	p = fork();
@@ -141,9 +142,4 @@ void exec_background(char * cmd, char ** arguments){
 	}
 
 	printf("Background process %d were started.\n", p);
-}
-
-/* Handles termination of processes */
-void func(){
-	printf("Exiting\n");
 }

@@ -2,6 +2,7 @@
 #include <errno.h>
 #include <string.h>
 #include <stdlib.h>
+#include <sys/time.h>
 
 #include "helper.h"
 
@@ -43,8 +44,8 @@ char ** handle_args(char * cmd, char * args){
 long timevaldiff(struct timeval * start, struct timeval * end){
   long usec;
 
-  usec=(end->tv_sec - start->tv_sec) * 1000000;
-  usec+=(end->tv_usec - start->tv_usec);
+  usec = (end->tv_sec - start->tv_sec) * 1000000;
+  usec += (end->tv_usec - start->tv_usec);
 
   return usec;
 }
