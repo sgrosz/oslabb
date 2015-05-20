@@ -24,5 +24,5 @@ void print_current_directory(){
 
 /* Changes the current directory with the path param */
 void change_dir(char * path){
-	handle_error(chdir(path), "cd.c:28");
+	handle_error(chdir(path), "cd.c:27");
 }

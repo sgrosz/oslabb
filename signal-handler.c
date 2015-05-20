@@ -30,9 +30,9 @@ void setup_child_handler(){
 	struct sigaction child;
 	child.sa_handler = &background_terminated;
 	child.sa_flags = SA_RESTART;
-	handle_error(sigemptyset(&child.sa_mask), "signal-handler.c:26");
+	handle_error(sigemptyset(&child.sa_mask), "signal-handler.c:33");
 
-	handle_error(sigaction(SIGCHLD, &child, 0), "signal-handler.c:28");
+	handle_error(sigaction(SIGCHLD, &child, 0), "signal-handler.c:35");
 }
 
 /*	Setups the signal handler for the signal SIGINT that are sent from the
@@ -45,9 +45,9 @@ void setup_interrupt_handler(){
 	struct sigaction interrupt;
 	interrupt.sa_handler = &interrupt_handler;
 	interrupt.sa_flags = SA_RESTART;
-	handle_error(sigemptyset(&interrupt.sa_mask), "signal-handler.c:36");
+	handle_error(sigemptyset(&interrupt.sa_mask), "signal-handler.c:48");
 
-	handle_error(sigaction(SIGINT, &interrupt, 0), "signal-handler.c:38");
+	handle_error(sigaction(SIGINT, &interrupt, 0), "signal-handler.c:50");
 }
 
 /*	If there have been an interrupt then the shell will output the prompt again. */
@@ -57,6 +57,6 @@ void interrupt_handler(int signum){
 	printf("$ ");
 
 	if(fflush(stdout) == EOF){
-		print_error("signal-hander.c:47");
+		print_error("signal-hander.c:60");
 	}
 }

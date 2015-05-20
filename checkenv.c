@@ -19,17 +19,17 @@ int status;
 	Then systematically execute printenv, grep, sort and pager. */
 void run_checkenv(char * args){
 	if(pipe(p1) == -1){
-		print_error("checkenv.c:19");
+		print_error("checkenv.c:21");
 		return;
 	}
 
 	if(pipe(p2) == -1){
-		print_error("checkenv.c:24");
+		print_error("checkenv.c:26");
 		return;
 	}
 
 	if(pipe(p3) == -1){
-		print_error("checkenv.c:29");
+		print_error("checkenv.c:31");
 		return;
 	}
 
@@ -47,17 +47,17 @@ void run_printenv(){
 	child = fork();
 
 	if(child == -1){
-		print_error("checkenv.c:44");
+		print_error("checkenv.c:47");
 		return;
 	} else if(child == 0){
-		handle_error(close(p1[READ]), "checkenv.c:48");
-		handle_error(dup2(p1[WRITE], WRITE), "checkenv.c:49");
+		handle_error(close(p1[READ]), "checkenv.c:53");
+		handle_error(dup2(p1[WRITE], WRITE), "checkenv.c:54");
 
-		handle_error(execlp("printenv", "printenv", NULL), "checkenv.c:51");
+		handle_error(execlp("printenv", "printenv", NULL), "checkenv.c:56");
 	}
 
-	handle_error(close(p1[WRITE]), "checkenv.c:54");
-	handle_error(wait(&status), "checkenv.c:55");
+	handle_error(close(p1[WRITE]), "checkenv.c:59");
+	handle_error(wait(&status), "checkenv.c:60");
 }
 
 /*	Turns the child into a forked process and checks if successful. If successful it
@@ -69,24 +69,24 @@ void run_grep(char * args){
 	child = fork();
 
 	if(child == -1){
-		print_error("checkenv.c:59");
+		print_error("checkenv.c:69");
 		return;
 	}else if(child == 0){
-		handle_error(dup2(p1[READ], READ), "checkenv.c:65");
+		handle_error(dup2(p1[READ], READ), "checkenv.c:75");
 
-		handle_error(close(p2[READ]), "checkenv.c:67");
-		handle_error(dup2(p2[WRITE], WRITE), "checkenv.c:68");
+		handle_error(close(p2[READ]), "checkenv.c:77");
+		handle_error(dup2(p2[WRITE], WRITE), "checkenv.c:78");
 
 		if(args == NULL){
-			handle_error(execlp("cat", "cat", NULL), "checkenv.c:71");
+			handle_error(execlp("cat", "cat", NULL), "checkenv.c:81");
 		} else{
-			handle_error(execvp("grep", handle_args("grep", args)), "checkenv.c:73");
+			handle_error(execvp("grep", handle_args("grep", args)), "checkenv.c:83");
 		}
 	}
 
-	handle_error(close(p1[READ]), "checkenv.c:77");
-	handle_error(close(p2[WRITE]), "checkenv.c:78");
-	handle_error(wait(&status), "checkenv.c:79");
+	handle_error(close(p1[READ]), "checkenv.c:87");
+	handle_error(close(p2[WRITE]), "checkenv.c:88");
+	handle_error(wait(&status), "checkenv.c:89");
 
 }
 
@@ -98,20 +98,20 @@ void run_sort(){
 	child = fork();
 
 	if(child == -1){
-		print_error("checkenv.c:84");
+		print_error("checkenv.c:98");
 		return;
 	}else if(child == 0){
-		handle_error(dup2(p2[READ], READ), "checkenv.c:90");
+		handle_error(dup2(p2[READ], READ), "checkenv.c:104");
 
-		handle_error(close(p3[READ]), "checkenv.c:92");
-		handle_error(dup2(p3[WRITE], WRITE), "checkenv.c:93");
+		handle_error(close(p3[READ]), "checkenv.c:106");
+		handle_error(dup2(p3[WRITE], WRITE), "checkenv.c:107");
 
-		handle_error(execlp("sort", "sort", NULL), "checkenv.c:95");
+		handle_error(execlp("sort", "sort", NULL), "checkenv.c:109");
 	}
 	
-	handle_error(close(p2[READ]), "checkenv.c:98");
-	handle_error(close(p3[WRITE]), "checkenv.c:99");
-	handle_error(wait(&status), "checkenv.c:100");
+	handle_error(close(p2[READ]), "checkenv.c:112");
+	handle_error(close(p3[WRITE]), "checkenv.c:113");
+	handle_error(wait(&status), "checkenv.c:114");
 }
 
 /*	Turns the child into a forked process and checks if successful. If successful we fetch
@@ -123,7 +123,7 @@ void run_pager(){
 	child = fork();
 
 	if(child == -1){
-		print_error("checkenv.c:105");
+		print_error("checkenv.c:123");
 		return;
 	} else if(child == 0){
 		char * pager_var = getenv("PAGER");
@@ -131,16 +131,16 @@ void run_pager(){
 			pager_var = "less";
 		}
 
-		handle_error(dup2(p3[READ], READ), "checkenv.c:116");
+		handle_error(dup2(p3[READ], READ), "checkenv.c:134");
 
 		/*This one ran outside the forloop -> in parent, not good*/
 		err = execlp(pager_var, pager_var, NULL);
 
 		/*If env-pager/less fails try more*/
 		if(err == -1)
-			handle_error(execlp("more", "more", NULL), "checkenv.c:123");
+			handle_error(execlp("more", "more", NULL), "checkenv.c:141");
 	}
 
-	handle_error(close(p3[READ]), "checkenv.c:126");
-	handle_error(wait(&status), "checkenv.c:127");
+	handle_error(close(p3[READ]), "checkenv.c:144");
+	handle_error(wait(&status), "checkenv.c:145");
 }
