@@ -137,7 +137,7 @@ void exec_foreground(char * cmd, char ** arguments){
 		print_error("program.c:134");
 		return;
 	} else if(p == 0){
-		handle_error(execvp(cmd, arguments), "program.c:140");
+		handle_exec_error(execvp(cmd, arguments), "program.c:140");
 	}
 
 	fprintf(stderr, "Foreground process %d were started.\n", p);
@@ -161,7 +161,7 @@ void exec_background(char * cmd, char ** arguments){
 		return;
 	} else if(p == 0){
 		handle_error(sighold(SIGINT), "program.c:163");
-		handle_error(execvp(cmd, arguments), "program.c:164");
+		handle_exec_error(execvp(cmd, arguments), "program.c:164");
 	}
 
 	fprintf(stderr, "Background process %d were started.\n", p);
@@ -173,6 +173,6 @@ void exec_background(char * cmd, char ** arguments){
 void exit_shell(){
 	pid_t parent;
 	parent = getpid();
-	
+
 	handle_error(kill(-parent, SIGTERM), "program.c:177");
 }

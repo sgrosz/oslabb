@@ -53,7 +53,7 @@ void run_printenv(){
 		handle_error(close(p1[READ]), "checkenv.c:53");
 		handle_error(dup2(p1[WRITE], WRITE), "checkenv.c:54");
 
-		handle_error(execlp("printenv", "printenv", NULL), "checkenv.c:56");
+		handle_exec_error(execlp("printenv", "printenv", NULL), "checkenv.c:56");
 	}
 
 	handle_error(close(p1[WRITE]), "checkenv.c:59");
@@ -78,9 +78,9 @@ void run_grep(char * args){
 		handle_error(dup2(p2[WRITE], WRITE), "checkenv.c:78");
 
 		if(args == NULL){
-			handle_error(execlp("cat", "cat", NULL), "checkenv.c:81");
+			handle_exec_error(execlp("cat", "cat", NULL), "checkenv.c:81");
 		} else{
-			handle_error(execvp("grep", handle_args("grep", args)), "checkenv.c:83");
+			handle_exec_error(execvp("grep", handle_args("grep", args)), "checkenv.c:83");
 		}
 	}
 
@@ -106,7 +106,7 @@ void run_sort(){
 		handle_error(close(p3[READ]), "checkenv.c:106");
 		handle_error(dup2(p3[WRITE], WRITE), "checkenv.c:107");
 
-		handle_error(execlp("sort", "sort", NULL), "checkenv.c:109");
+		handle_exec_error(execlp("sort", "sort", NULL), "checkenv.c:109");
 	}
 	
 	handle_error(close(p2[READ]), "checkenv.c:112");
@@ -138,7 +138,7 @@ void run_pager(){
 
 		/*If env-pager/less fails try more*/
 		if(err == -1)
-			handle_error(execlp("more", "more", NULL), "checkenv.c:141");
+			handle_exec_error(execlp("more", "more", NULL), "checkenv.c:141");
 	}
 
 	handle_error(close(p3[READ]), "checkenv.c:144");

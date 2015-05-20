@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <sys/time.h>
+#include <unistd.h>
 
 #include "helper.h"
 
@@ -22,6 +23,15 @@ void print_error(char * message){
 void handle_error(int err, char * message){
 	if(err == -1){
 		print_error(message);
+	}
+}
+
+/*	Checks if the int err given from the parameter is -1, if so then it will
+	print the error with the given message. It also exits the process. */
+void handle_exec_error(int err, char * message){
+	if(err == -1){
+		print_error(message);
+		_exit(1);
 	}
 }
 
