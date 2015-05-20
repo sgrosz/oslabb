@@ -160,6 +160,7 @@ void exec_background(char * cmd, char ** arguments){
 		print_error("program.c:141");
 		return;
 	} else if(p == 0){
+		handle_error(sighold(SIGINT), "program.c:163");
 		handle_error(execvp(cmd, arguments), "program.c:146");
 	}
 
